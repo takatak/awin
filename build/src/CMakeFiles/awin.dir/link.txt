@@ -1,1 +1,0 @@
-/usr/bin/cc      CMakeFiles/awin.dir/awin.c.o CMakeFiles/awin.dir/mywin.c.o CMakeFiles/awin.dir/mymem.c.o  -o awin -rdynamic -lX11 

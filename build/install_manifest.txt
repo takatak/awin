@@ -1,2 +1,0 @@
-/usr/local/bin/awin
-/usr/local/man/man1/awin.1
