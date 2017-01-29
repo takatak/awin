@@ -1,10 +1,10 @@
-README.TXT
+README
 
 AWIN (Activate WINdow)
 
-This is a tool based on wmctrl to raise the window(s) top or to lounch application.
+This is a tool to raise the window top or to lounch application.
 
-Copyright 2015 Takataka
+Copyright 2015-2017 Takataka
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

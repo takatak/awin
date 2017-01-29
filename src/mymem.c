@@ -1,4 +1,4 @@
-// Copyright 2015 Takataka
+// Copyright 2015-2017 Takataka
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 #include "mymem.h"
 
-		// please adjust to your envirenment or using style .
+        // please adjust to your envirenment or using style .
 #define MYALLOC_MAX_POOL            10
 #define MYALLOC_DEFAULT_ALLOC_UNIT  65536
 
@@ -37,7 +37,7 @@ void *MyAssignMem(int size){
 	void *p=NULL;
 
 	MyManageMem(ASSIGN_MEM,size,&p);
-	if (p == NULL) {
+	if( p == NULL ) {
 		fprintf(stderr,"Err:alloc mem for size:%d\n",size);
 		exit(EXIT_FAILURE);
 	}
@@ -52,17 +52,15 @@ void MyFreeMem(void *p){
 	MyManageMem(FREE_MEM,0,&p);
 }
 
-#define IGNORE_ALLFREE
-
 int MyManageMem(int iProcType,int iSize,void **pp){
-	static int      iAllocedPoolCnt=0;
-	static void     *AllocedPool[MYALLOC_MAX_POOL]={NULL};
-	static long     amount[MYALLOC_MAX_POOL]={0};
-	static long     freepos[MYALLOC_MAX_POOL]={0};
-	static long     alloc_unit = MYALLOC_DEFAULT_ALLOC_UNIT;
-	int             iRet=EXIT_SUCCESS;
+	static int 		 iAllocedPoolCnt=0;
+	static void		*AllocedPool[MYALLOC_MAX_POOL]={NULL};
+	static long		 amount[MYALLOC_MAX_POOL]={0};
+	static long		 freepos[MYALLOC_MAX_POOL]={0};
+	static long		 alloc_unit = MYALLOC_DEFAULT_ALLOC_UNIT;
+	int				 iRet=EXIT_SUCCESS;
 
-	switch(iProcType){
+	switch( iProcType ){
 		case SET_UNIT:
 			alloc_unit=abs(iSize);                   // change allocation unit
 			break;
@@ -70,10 +68,10 @@ int MyManageMem(int iProcType,int iSize,void **pp){
 			{
 				size_t  al;
 
-				if ( AllocedPool[iAllocedPoolCnt] == NULL){         // 1st call
-					for(al=alloc_unit;al < iSize+1; al+=alloc_unit);
+				if( AllocedPool[iAllocedPoolCnt] == NULL){         // 1st call
+					for( al=alloc_unit ; al < iSize+1 ; al+=alloc_unit );
 					AllocedPool[iAllocedPoolCnt] = malloc(al);
-					if (AllocedPool[iAllocedPoolCnt] == NULL ){
+					if( AllocedPool[iAllocedPoolCnt] == NULL ){
 						perror("Err:alloc mem");
 						exit(EXIT_FAILURE);
 					}
@@ -81,11 +79,11 @@ int MyManageMem(int iProcType,int iSize,void **pp){
 					amount[iAllocedPoolCnt]=al;
 					freepos[iAllocedPoolCnt]=0;
 				}else{
-					if (freepos[iAllocedPoolCnt]+iSize+1 >= amount[iAllocedPoolCnt]){    // need new pool
-						if (++iAllocedPoolCnt < MYALLOC_MAX_POOL){
-							for(al=alloc_unit;al < iSize+1; al+=alloc_unit);
+					if( freepos[iAllocedPoolCnt]+iSize+1 >= amount[iAllocedPoolCnt] ){    // need new pool
+						if( ++iAllocedPoolCnt < MYALLOC_MAX_POOL ){
+							for( al=alloc_unit ; al < iSize+1 ; al+=alloc_unit );
 							AllocedPool[iAllocedPoolCnt] = malloc(al);
-							if (AllocedPool[iAllocedPoolCnt] == NULL ){
+							if( AllocedPool[iAllocedPoolCnt] == NULL ){
 								perror("Err:alloc mem");
 								exit(EXIT_FAILURE);
 							}
@@ -106,17 +104,15 @@ int MyManageMem(int iProcType,int iSize,void **pp){
 			// now no operation
 			break;
 		case FREE_ALLMEM:
-#ifndef IGNORE_ALLFREE
-			{ // now not used/tested 、so comment outed
-				int i;
-				for (i=0;i<MYALLOC_MAX_POOL;i++){
-					if ( AllocedPool[i] != NULL ) free(AllocedPool[i]);
-					AllocedPool[i]=NULL;
-					amount[i]=0;
-					freepos[i]=0;
-				}
-			}
-#endif
+//            { // now not used/tested 、ソcomment outed
+//                int i;
+//                for( i=0 ; i < MYALLOC_MAX_POOL ; i++ ){
+//                    if( AllocedPool[i] != NULL ) free(AllocedPool[i]);
+//                    AllocedPool[i]=NULL;
+//                    amount[i]=0;
+//                    freepos[i]=0;
+//                }
+//            }
 			break;
 		default:
 			iRet=EXIT_FAILURE;
@@ -124,4 +120,3 @@ int MyManageMem(int iProcType,int iSize,void **pp){
 
 	return iRet;
 }
-

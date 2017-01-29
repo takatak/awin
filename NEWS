@@ -1,0 +1,6 @@
+New in 2.2
+	add -S option
+        -G option is changed more safty and certainty
+        change check logic in -c option
+        change build tool from autoconf to CMake
+        change awin.1 ( japanese )

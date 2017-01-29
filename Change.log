@@ -1,0 +1,29 @@
+awin
+---------- -------- --------------------------------------------------------------
+2015-10-30 Ver 1.0  Initial Version
+2015-11-05 Ver 1.1  Change memory management
+2015-11-20 Ver 2.0  not use wmctrl
+2017-01-17 Ver 2.1  Bug Fix
+                      add MyCheckDuplicate()  in mywin.c
+                      add logic for -P option in awin.c
+                      modify getWinList()     in mywin.c
+                    add -f option in awin.c
+                    add -t option in awin.c / mywin.c
+                    change list number ( from 0-  to 1- ) in awin.c mywin.c
+                    add MyExit() in awin.c
+                    add check logic whether -l option with -m/-w or not
+                    add MyExec() in awin.c
+                    add -T option and -g option in awin.c / mywin.c
+                    add check logic whether command (-c ) is exist or not
+2017/01/28 Ver 2.2  -G option is changed more safty and certainty in awin.c / mywin.c 
+                      add MyGetWinList()    in mywin.c
+                      add fGetWinFramePos() in mywin.c
+                    chenge check logic whether command ( -c ) is exist or not in awin.c
+                      add Is_Executable() , Is_Directory() , ParseDir()
+                    add -S option in awin.c mywin.c
+                      add MyChengeState() in mywin.c
+                    add comment
+                    change logic for priority
+                      add MySetPriority() in mywin.c
+                    Bug Fix 
+                       remove unnecessary regfree() -> work fine with clang/llvm

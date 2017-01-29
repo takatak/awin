@@ -1,4 +1,4 @@
-// Copyright 2015 Takataka
+// Copyright 2015-2016 Takataka
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 	/* nop */
 #else
 	#define INCLED_MYMEM_H
-	void	*MyAssignMem(int );
-	void	MyFreeMem(void *);
-	void	MyChangeUnitMem(int );
+	void *MyAssignMem(int );
+	void  MyFreeMem(void *);
+	void  MyChangeUnitMem(int );
 #endif
