@@ -37,7 +37,7 @@ void *MyAssignMem(int size){
 	void *p=NULL;
 
 	MyManageMem(ASSIGN_MEM,size,&p);
-	if( p == NULL ) {
+	if( p == NULL ){
 		fprintf(stderr,"Err:alloc mem for size:%d\n",size);
 		exit(EXIT_FAILURE);
 	}

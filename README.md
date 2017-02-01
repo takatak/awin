@@ -18,7 +18,7 @@ Autokey や xbindkeys を利用しても良いのかも知れませんが私は�
 
 ### CMake
       sudo apt-get install cmake
-  
+
 
 ### libx11-dev
       sudo apt-get install libx11-dev
@@ -29,7 +29,7 @@ Autokey や xbindkeys を利用しても良いのかも知れませんが私は�
 ### Makefile 生成
 
 build サブ・ディレクトリに移動して、「cmake ../」を実行
-
+ (build サブ・ディレクトリがなければ、「mkdir build」を実行して作成する)
 
 ### make
 
@@ -48,7 +48,7 @@ build サブ・ディレクトリで、「sudo make install」を実行
 ## コマンドラインでオプションの設定等を確定させます
 以下では、leafpad というテキストエディタを例にして説明します。
 
-1. leafpad を何らかの方法で起動しておきます。混乱を防ぐために、最初は他のウィンドウは閉じておくのが良いでしょう。
+1. leafpad を何らかの方法で起動しておきます。混乱を防ぐために、慣れるまでは他のウィンドウは閉じておくのが良いでしょう。
 
 2. 「awin -l」を実行します。
     （マークダウンの知識が乏しく上手く表記できないので、空白はアンダースコアで表現します。）

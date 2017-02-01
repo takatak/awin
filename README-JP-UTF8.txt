@@ -422,6 +422,10 @@ python と Quickey.py と wmctrl(複数回?) を呼び出すより、このツ�
    int client_msg()
        クライアント・ウィンドウにイベントを送ります。良く理解していません。
 
+   int window_to_all_desktop()
+       ウィンドウのデスクトップを全てのデスクトップに変更します。
+       KDEではSTICKYをセットしたのではダメだったので追加しました。
+
    int window_to_desktop ()
        ウィンドウのデスクトップを変更します。
 

@@ -27,6 +27,7 @@
 #include <locale.h>
 #include <regex.h>
 #include <unistd.h>
+#include <sys/wait.h>
 
 #include <dirent.h>
 #include <sys/types.h>
@@ -45,7 +46,7 @@
 #include "mywin.h"
 #include "awin.h"
 
-#define VERSION "2.2"
+#define VERSION "2.3"
 #define HELP "\nawin " VERSION "\n\n" \
 " Usage: awin [OPTION]...\n" \
 "\n" \
@@ -75,12 +76,13 @@
 "                       order : \n" \
 "                          a : ascending             d : descending \n" \
 "                  in case of set -p or -P , then you can set only field:1 (PID) or 2 (cmdline)\n" \
-"   -S <state>     change existing window's state ( with -a / -A option )\n" \
+"   -S <state>     change the window's state ( with -a / -A option )\n" \
 "                    format: action,state\n" \
 "                        action : 'a' or 'r' or 't' (a:add,r:remove,t:toggle)\n" \
 "                        state  : one of followings\n" \
 "                                 MODAL,STICKY,MAXIMIZED_VERT,MAXIMIZED_HORZ,SHADED,SKIP_TASKBAR,\n" \
 "                                 SKIP_PAGER,HIDDEN,FULLSCREEN,ABOVE,BELOW,DEMANDS_ATTENTION\n"  \
+"   -D             set the window should appear on all desktops.\n" \
 "\n" \
 "Notion  : <SEARCH>  you can use regular expression.\n" \
 "          if no option passed then same  'awin -l'.\n\n" \
@@ -102,6 +104,7 @@
 
 /* global variable */
 MySortConfig SortConfig[SORT_MAX];
+extern bool 	 fActionAllDesktop;
 
 /* ----------------------------------
  *  function : check string contain only num or not , and calc number of digits 
@@ -198,12 +201,12 @@ int GetProcessList(MyPList *plist,regex_t *ppreg, regmatch_t* pmatch){
 						// nop
 					}else{
 						sprintf(path_cmdline,"/proc/%d/cmdline",iPID);
-						if( (fd = open(path_cmdline, O_RDONLY)) != -1 ) {
+						if( (fd = open(path_cmdline, O_RDONLY)) != -1 ){
 							int iReadLen;
 							memset(szReadLine,0x00,sizeof(szReadLine));
 							iReadLen=read(fd,szReadLine,sizeof(szReadLine));
 							if( iReadLen > 0 ){
-								if( plist->iCnt + 1 >= PDATA_MAX ) {
+								if( plist->iCnt + 1 >= PDATA_MAX ){
 									perror("Err:exceed max process");
 									exit(EXIT_FAILURE);
 								}else{
@@ -399,7 +402,7 @@ int Is_Directory(char *dname){
  *            ERR_RC_MEM_SHORT_STRDUP_DIR   - memory shortage
  *            ERR_RC_MEM_SHORT_STRDUP_BASEC - memory shortage
  *            ERR_RC_MEM_SHORT_STRDUP_REST  - memory shortage
- *            ERR_RC_NOT_EXIST_DIR          - dir is not exist
+ *            ERR_RC_NOT_EXIST_DIR          - dir  is not exist
  *            ERR_RC_NOT_EXIST_OR_NOT_EXEC  - base is not executable
  */
 int ParseDir(const char *source,char **dir,char **base,char **rest,int *length_dir,int *length_base,int *length_rest){
@@ -652,7 +655,7 @@ int main(int argc,char **argv){
 
 	setlocale(LC_ALL, "");
 
-	if( !(disp = XOpenDisplay(NULL)) ) {
+	if( !(disp = XOpenDisplay(NULL)) ){
 		fprintf(stderr,"Err:cannot open X display.\n");
 		MyExit(NULL,EXIT_FAILURE);
 	}
@@ -678,11 +681,11 @@ int main(int argc,char **argv){
 		int 			 i_retry_cnt_winget=MAX_RETRY_CNT_WINGET;
 		bool    		 fExec = false;
 
-		if( ( argc == 2 ) && argv[1] ) {
-			if( strcmp(argv[1], "--help" ) == 0 ) {
+		if( ( argc == 2 ) && argv[1] ){
+			if( strcmp(argv[1], "--help" ) == 0 ){
 				fputs(HELP, stdout);
 				MyExit(disp,EXIT_SUCCESS);
-			}else if( strcmp(argv[1], "--version" ) == 0 ) {
+			}else if( strcmp(argv[1], "--version" ) == 0 ){
 				fputs(VERSION, stdout);
 				MyExit(disp,EXIT_SUCCESS);
 			}
@@ -694,8 +697,11 @@ int main(int argc,char **argv){
 		}
 
 		// parse arguments
-		while( (option = getopt(argc,argv,"lL:aAc:C:swo:pP:mft:g:G:T:r:S:")) != -1 ){
+		while( (option = getopt(argc,argv,"lL:aAc:C:swo:pP:mft:g:G:T:r:S:D")) != -1 ){
 			switch( option ){
+				case 'D':
+					fActionAllDesktop  = true;
+					break;
 				case 'l':
 					action = ACTION_LIST;
 					break;
@@ -734,8 +740,8 @@ int main(int argc,char **argv){
 					iRegField=REG_FIELD_MACHINE;
 					fprintf(stderr,"Inf:Check filed is machine instead of title\n");
 					break;
-				case 'g':	// grid (x,y)
-				case 'G':	// grid (x,y)
+				case 'g':	// grid (x,y) -- existing
+				case 'G':	// grid (x,y) -- at exec
 					if( sscanf(optarg, "%ld,%ld", &move_x, &move_y) != 2 ){
 						fprintf(stderr, "Err:invalid format grid ( -g / -G ) \n" );
 						MyExit(disp,EXIT_FAILURE);
@@ -905,7 +911,7 @@ int main(int argc,char **argv){
 			}
 			// compile regexp
 			iRc = regcomp(&preg,szSearchString,REG_EXTENDED|REG_NEWLINE);
-			if( iRc != 0 ) {
+			if( iRc != 0 ){
 				// Error!, print error reason
 				regerror(iRc, &preg, szBuf, sizeof(szBuf));
 				fprintf(stderr,"Err:regcomp() failed with '%s'\n", szBuf);
@@ -979,7 +985,7 @@ int main(int argc,char **argv){
 			}
 			if( plist.iCnt > 0 ){
 				int iDigitCnt = digit(plist.iCnt+1);
-				if( SortConfig[0].iSortField != SORT_NONE ) {
+				if( SortConfig[0].iSortField != SORT_NONE ){
 					qsort(plist.pdata,plist.iCnt,sizeof(MyPData),MyCompPList);
 				}
 				print_list_pid(iDigitCnt,&plist);
@@ -1097,7 +1103,7 @@ int main(int argc,char **argv){
 					}
 				}
 				if( WinList.iCnt > 0 ){
-					if( SortConfig[0].iSortField != SORT_NONE ) {
+					if( SortConfig[0].iSortField != SORT_NONE ){
 						qsort(WinList.data,WinList.iCnt,sizeof(MyWinData),MyCompWin);
 					}else{
 						;;;;;;;;;;debug_printf(stderr,"Dbg:SORT_NONE\n");

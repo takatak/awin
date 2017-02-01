@@ -45,6 +45,7 @@
 
 /* global variable */
 extern MySortConfig SortConfig[SORT_MAX];
+bool 	fActionAllDesktop  = false;
 
 
 #define MAX_PROPERTY_VALUE_LEN 4096
@@ -55,20 +56,21 @@ extern MySortConfig SortConfig[SORT_MAX];
 /* ------------------------------- */
 
 bool fGetWinFramePos(Display *disp, const Window win,int *x,int *y);
-unsigned char	*get_prop (Display *disp, Window win,
-							Atom xa_prop_type, const char *prop_name, int *pret_format,ulong *pret_ntimes);
+unsigned char	*get_prop(Display *disp, Window win,
+							Atom xa_prop_type, const char *prop_name, int *pret_format,unsigned long *pret_ntimes);
 Window 			*get_client_list(Display *disp, unsigned long *size);
 unsigned long 	 get_pid(Display *disp,Window win);
-char 			*get_property (Display *disp, Window win,
+char 			*get_property(Display *disp, Window win,
 								Atom xa_prop_type, const char *prop_name, unsigned long *size);
 int 			 client_msg(Display *disp, Window win, char *msg,unsigned long data0, unsigned long data1,
 											unsigned long data2, unsigned long data3,unsigned long data4);
-int 			 window_to_desktop (Display *disp, Window win, int desktop);
+int 			 window_to_desktop(Display *disp, Window win, int desktop);
 char 			*get_machine(Display *disp,Window win);
 char 			*get_wmclass(Display *disp,Window win);
 char 			*get_title(Display *disp,Window win);
 int 			 MyCompWinA(const void *a,const void *b,const int iCompTimes);
 int 			 MyCheckDuplicate(const MyWinData *a,const MyWinData *b);
+int 			 window_to_all_desktop(Display *disp, Window win);
 
 
 /* ------------------------------- */
@@ -441,6 +443,9 @@ void activate_window(Display *disp, Window win,bool switch_desktop){
 	client_msg(disp, win, "_NET_ACTIVE_WINDOW",0, 0, 0, 0, 0);
 	XMapRaised(disp, win);
 	MyChengeState(MYSTATE_PROC_DO,0x00, NULL,disp,win);
+	if( fActionAllDesktop  == true ){
+		window_to_all_desktop(disp,win);
+	}
 }
 
 /* ----------------------------------
@@ -772,7 +777,6 @@ unsigned char *get_prop (Display *disp, Window win,
 
 	xa_prop_name = XInternAtom(disp, prop_name, False);
 
-
 	if( XGetWindowProperty(disp, win, xa_prop_name, 0,
 							MAX_PROPERTY_VALUE_LEN / 4, False,
 							xa_prop_type, &xa_ret_type, &ret_format,
@@ -799,7 +803,7 @@ unsigned char *get_prop (Display *disp, Window win,
  *              size           - address of size
  *  return   :  ret            - address of list
  */
-Window *get_client_list(Display *disp, unsigned long *size) {
+Window *get_client_list(Display *disp, unsigned long *size){
 	int 			 ret_format;
 	unsigned long 	 ret_nitems;
 	unsigned long 	 tmp_size;
@@ -818,7 +822,7 @@ Window *get_client_list(Display *disp, unsigned long *size) {
 		ret = (Window *)MyAssignMem(tmp_size+1);
 		memcpy(ret, ret_prop, tmp_size);
 
-		if( size ) {
+		if( size ){
 			*size = tmp_size;
 		}
 
@@ -856,7 +860,7 @@ char *get_property (Display *disp, Window win,
 		ret = (char *)MyAssignMem(tmp_size+1);
 		memcpy(ret, ret_prop, tmp_size);
 
-		if( size ) {
+		if( size ){
 			*size = tmp_size;
 		}
 
@@ -911,6 +915,17 @@ int client_msg(Display *disp, Window win, char *msg,
 	}
 }
 
+/* ----------------------------------
+ *  function : make window to all desktop
+ *  parms    :  disp           - display
+ *              win            - window
+ *  return   :  EXIT_SUCCESS   - no error
+ *              EXIT_FAILURE   - error
+ */
+int window_to_all_desktop(Display *disp, Window win){
+	return client_msg(disp, win, "_NET_WM_DESKTOP", (unsigned long)0xFFFFFFFF,
+						0, 0, 0, 0);
+}
 /* ----------------------------------
  *  function : move window to desktop
  *  parms    :  disp           - display

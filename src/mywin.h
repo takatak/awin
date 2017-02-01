@@ -72,4 +72,5 @@ int		MyCompWin( const void *  , const void * );
 void	DisplayWinList(MyWinList *);
 int		MyChengeState(int ,char , char *,Display *, Window);
 
+
 #endif

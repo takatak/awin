@@ -27,3 +27,5 @@ awin
                       add MySetPriority() in mywin.c
                     Bug Fix 
                        remove unnecessary regfree() -> work fine with clang/llvm
+2017/02/01 Ver 2.3  -D option add
+                    support make on freebsd11/clang

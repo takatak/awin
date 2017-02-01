@@ -1,5 +1,5 @@
 .\" $Id$ -*-nroff-*-
-.TH "awin" 1 "2017-01-27"
+.TH "awin" 1 "2017-01-31"
 
 .SH 名前
 awin \- ウィンドウをアクティベートする
@@ -184,6 +184,9 @@ awin \- ウィンドウをアクティベートする
 .br
   -a または -A オプションを指定していないと有効ではありません。
 
+.TP
+.BI \-D
+ウィンドウを全てのデスクトップで表示されるようにします。
 
 .SH 例
 .PP
@@ -256,6 +259,16 @@ awin -w -L lxterminal.Lxterminal -o 1,d -a -g 0,0 -G 100,100 -C /usr/bin/lxtermi
 .IP
 awin -w -L xeyes.XEyes -a -c "/usr/bin/xeyes -geometry 100x100-0-0" -S a,ABOVE
 
+.PP
+管理されているウィンドウの中で、クラスが"xeyes.XEyes"になっているものをリスト表示します。
+.br
+もし存在しなければ、"/usr/bin/xeyes  -geometry 100x100-0-0" を実行します。
+.br
+ウィンドウが常に前面に出ているように設定します。
+.br
+ウィンドウが全てのデスクトップで表示されるように設定します。
+.IP
+awin -w -L xeyes.XEyes -a -c "/usr/bin/xeyes -geometry 100x100-0-0" -S a,ABOVE -D
 
 .SH 関連項目
 .BR wmctrl(1).
